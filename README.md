@@ -1,118 +1,105 @@
-<a href="https://www.twilio.com">
-  <img src="https://static0.twilio.com/marketing/bundles/marketing/img/logos/wordmark-red.svg" alt="Twilio" width="250" />
-</a>
+# Adding SIM Swap Detection to your Web App's 2FA Login Flow with Twilio Verify & tru.ID SIMCheck API
 
-# Twilio Verify Quickstart with Twilio, Node.js, and Express
+## Requirements
 
-![](https://github.com/TwilioDevEd/verify-v2-quickstart-node/workflows/Node.js/badge.svg)
+The requirements for these project are:
 
-> This template is part of Twilio CodeExchange. If you encounter any issues with this code, please open an issue at [github.com/twilio-labs/code-exchange/issues](https://github.com/twilio-labs/code-exchange/issues).
+- Node 10 or higher
+- A [Twilio Account](https://www.twilio.com)
+- A [tru.ID Account](https://tru.id)
+- [SQLite3](https://www.sqlite.org/download.html)
 
+## Getting Started
 
-## About
+This project uses Twilio's [verify-v2-quick-start-node](https://github.com/TwilioDevEd/verify-v2-quickstart-node) as the base in the `starter-files` branch.
 
-This application example demonstrates how to do simple phone verification with Nodejs and Twilio Verify.
+Clone the `starter-files` branch via:
 
-[Read the full quickstart here](https://www.twilio.com/docs/verify/api-beta/quickstarts/node-express)!
-
-Implementations in other languages:
-
-| .NET | Java | Python | PHP | Ruby |
-| :--- | :--- | :----- | :-- | :--- |
-| [Done](https://github.com/TwilioDevEd/verify-v2-quickstart-csharp) | [Done](https://github.com/TwilioDevEd/verify-v2-quickstart-java)  | [Done](https://github.com/TwilioDevEd/verify-v2-quickstart-python)    | [Done](https://github.com/TwilioDevEd/verify-v2-quickstart-php) | [Done](https://github.com/TwilioDevEd/verify-v2-quickstart-rails)  |
-
-
-## Set up
-
-### Requirements
-
-- [Nodejs](https://nodejs.org/) v10 or v12
-- [Sqlite3](https://www.sqlite.org/)
-
-### Twilio Account Settings
-
-This application should give you a ready-made starting point for writing your own application.
-Before we begin, we need to collect all the config values we need to run the application:
-
-| Config Value | Description |
-| :----------  | :---------- |
-| TWILIO_ACCOUNT_SID / TWILIO_AUTH_TOKEN  | For Twilio API credentials find [here](https://www.twilio.com/console)|
-| VERIFICATION_SID  | For Verification Service SID [here](https://www.twilio.com/console/verify/services) |
-
-### Local development
-
-1. First clone this repository and `cd` into it.
-
-   ```bash
-   git clone git@github.com:TwilioDevEd/verify-v2-quickstart-node.git
-   cd verify-v2-quickstart-node
-   ```
-
-2. Install dependencies.
-
-   ```bash
-   npm install
-   ```
-
-3. Set your environment variables. Copy the `env.example` file and edit it.
-
-    ```bash
-    cp .env.example .env
-    ```
-
-    See [Twilio Account Settings](#twilio-account-settings) to locate the necessary environment variables.
-
-4. Run the web app.
-
-    ```bash
-    npm start
-    ```
-
-5. The application should now be running on http://localhost:3000/, here you can
-register a new user account and proceed with a phone verification.
-
-That's it!
-
-### Docker
-
-If you have [Docker](https://www.docker.com/) already installed on your machine, you can use our `docker-compose.yml` to setup your project.
-
-1. Make sure you have the project cloned.
-2. Setup the `.env` file as outlined in the [Local Development](#local-development) steps.
-3. Run `docker-compose up`.
-
-### Tests
-
-You can run the tests locally by typing:
-
-```bash
-npm test
+```
+git clone -b starter-files --single-branch https://github.com/tru-ID/sms-2fa-sim-swap-detection.git
 ```
 
-### Cloud deployment
+If you're only interested in the finished code in `main` then run:
 
-Additionally to trying out this application locally, you can deploy it to a variety of host services. Here is a small selection of them.
+```
+git clone -b main https://github.com/tru-ID/sms-2fa-sim-swap-detection.git
+```
 
-Please be aware that some of these might charge you for the usage or might make the source code for this application visible to the public. When in doubt research the respective hosting service first.
+Next you need to configure Twilio using your account credentials.
 
-| Service                           |                                                                                                                                                                                                                           |
-| :-------------------------------- | :------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| [Heroku](https://www.heroku.com/) | [![Deploy](https://www.herokucdn.com/deploy/button.svg)](https://heroku.com/deploy)                                                                                                                                       |
+Copy the values of `.env.example` into a `.env` file via:
 
-## Resources
+```
+cp .env.example .env
+```
 
-- The CodeExchange repository can be found [here](https://github.com/twilio-labs/code-exchange/).
+Open the `.env` file and configure the following values:
 
-## Contributing
+- `TWILIO_ACCOUNT_SID`: Your Twilio account SID found [here](https://www.twilio.com/console)
+- `TWILIO_AUTH_TOKEN`: Your Twilio Auth Token that can be found [here](https://www.twilio.com/console/)
+- `VERIFICATION_SID`: This project uses Twilio Verify to send verification codes and to check their status - [create a service here](https://www.twilio.com/console/verify/services)
 
-This template is open source and welcomes contributions. All contributions are subject to our [Code of Conduct](https://github.com/twilio-labs/.github/blob/master/CODE_OF_CONDUCT.md).
+Next, Create a [tru.ID Account](https://tru.id)
 
-## License
+Install the **tru.ID** CLI via:
 
-[MIT](http://www.opensource.org/licenses/mit-license.html)
+```bash
+npm i -g @tru_id/cli
 
-## Disclaimer
+```
 
-No warranty expressed or implied. Software is as is.
+Input your **tru.ID** credentials which can be found within the tru.ID [console](https://developer.tru.id/console)
 
-[twilio]: https://www.twilio.com
+Create a new **tru.ID** project via:
+
+```
+tru projects:create sms-2fa
+```
+
+configure the following values in your `.env`:
+
+- `TRU_ID_CLIENT`: The client ID found in the `tru.json` file in the newly created **tru.ID** project.
+- `TRU_ID_SECRET`: The client secret found in the `tru.json` file in the newly created **tru.ID** project.
+
+Finally start up `sqlite3`
+
+## Restoring Dependencies
+
+In order to restore dependencies run:
+
+```bash
+npm install
+```
+
+This comes will also run Database migrations creating the `users` table.
+
+If you would like to seed the project with a user:
+
+Navigate to `seeders/createUser.js` and replace the `phoneNumber` value with your own `phoneNumber`
+
+Next seed the database by running:
+
+```
+npm run seed
+```
+
+## Starting Project
+
+In order to start the project run:
+
+```bash
+npm run linuxstart #for running on Linux machines e.g. Mac
+# or
+npm run winstart #for running on Windows machines
+```
+
+## References
+
+- [**tru.ID** docs](https://developer.tru.id/docs)
+- [Twilio's verify-v2-quick-start-node](https://github.com/TwilioDevEd/verify-v2-quickstart-node)
+
+## Meta
+
+Distributed under the MIT License. See [LICENSE](https://github.com/tru-ID/sms-2fa-sim-swap-detection/blob/main/LICENSE.md)
+
+[**tru.ID**](https://tru.id)
