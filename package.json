@@ -4,12 +4,15 @@
   "private": false,
   "license": "MIT",
   "scripts": {
-    "start": "export DEBUG=verify-v2-quickstart-node:server && node ./bin/www",
+    "linuxstart": "export DEBUG=verify-v2-quickstart-node:server && node ./bin/www",
+    "winstart": "set DEBUG=verify-v2-quickstart-node:server && node ./bin/www",
     "pretest": "sequelize db:migrate --env test",
+    "sequelize": "sequelize",
     "test": "./node_modules/.bin/mocha './{,!(node_modules)/**}/*.spec.js'",
     "test_watch": "./node_modules/.bin/mocha -w './{,!(node_modules)/**}/*.spec.js'",
     "postinstall": "npm run build && sequelize db:migrate",
-    "build": "webpack --mode=development"
+    "build": "webpack --mode=development",
+    "seed": "npm run sequelize db:seed:undo:all && npm run sequelize db:seed:all"
   },
   "dependencies": {
     "autoprefixer": "^10.2.5",
