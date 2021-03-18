@@ -22,7 +22,7 @@ router.get("/", ensureLoggedIn(), async (req, res) => {
       console.log(no_sim_change);
       // If the SIM has changed we inform the client
       if (!no_sim_change) {
-        return res.render("sim-changed", { error: "SIMCheck failed. SIM changed too recently." });
+        return res.render("sim-changed", { error: "Cannot proceed. SIM changed too recently ❌" });
       }
       verificationRequest = await twilio.verify
         .services(VERIFICATION_SID)

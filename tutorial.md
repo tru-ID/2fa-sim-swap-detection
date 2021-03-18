@@ -1,14 +1,12 @@
-# Adding SIM Swap Detection to your Web App's 2FA Login Flow with Twilio Verify & tru-ID SIMCheck API
+# Adding SIM Swap Detection to your Web App's 2FA Login Flow with Twilio Verify & tru.ID SIMCheck API
 
-In today's tutorial you're going to learn how to add SIM Swap Detection to your existing Web App's Two-Factor authentication login flow with **tru-ID's** [SIMCheck API](https://developer.tru.id/docs/sim-check/guide).
+In today's tutorial you're going to learn how to add SIM Swap Detection to your existing Web App's Two-Factor authentication login flow with **tru.ID's** [SIMCheck API](https://developer.tru.id/docs/sim-check/guide).
 
 We're going to be using Twilio's [verify-v2-quick-start-node](https://github.com/TwilioDevEd/verify-v2-quickstart-node) as the existing 2FA base.
 
-Before we begin let's talk about why you would want to secure your applications with the **tru-ID** SIMCheck API.
+Before we begin let's talk about why you would want to secure your applications with the **tru.ID** SIMCheck API.
 
-## The tru-ID SIMCheck API
-
-The **tru-ID** SIMCheck API provides information on when a SIM card associated with a mobile phone number was last changed. This provides an extra layer of security in your application login flows as it guards against the possibility the user's SIM was swapped (hence why the SIM changed recently). It can be used to augment existing 2FA or anti-fraud workflows.
+The **tru.ID** SIMCheck API provides information on when a SIM card associated with a mobile phone number was last changed. This provides an extra layer of security in your application login flows as it guards against the possibility the user's SIM was swapped (hence why the SIM changed recently). It can be used to augment existing 2FA or anti-fraud workflows.
 
 ## Before you begin
 
@@ -29,13 +27,9 @@ Clone the `starter-files` branch via:
 git clone -b starter-files --single-branch https://github.com/tru-ID/sms-2fa-sim-swap-detection.git
 ```
 
-If you're only interested in the finished code in `main` then run:
+If you're only interested in the finished code in `main` then head over to the GitHub [repo](https://github.com/tru-ID/sms-2fa-sim-swap-detection)
 
-```
-git clone -b main https://github.com/tru-ID/sms-2fa-sim-swap-detection.git
-```
-
-## Getting setup with Twilio
+### Getting setup with Twilio
 
 You need to configure Twilio using your account credentials.
 
@@ -51,20 +45,20 @@ Open the `.env` file and configure the following values:
 - `TWILIO_AUTH_TOKEN`: Your Twilio Auth Token that can be found [here](https://www.twilio.com/console/)
 - `VERIFICATION_SID`: This project uses Twilio Verify to send verification codes and to check their status - [create a service here](https://www.twilio.com/console/verify/services)
 
-## Getting setup with tru-ID
+### Getting setup with tru-ID
 
-Create a [tru-ID Account](https://tru.id)
+Create a [tru.ID Account](https://tru.id)
 
-Install the **tru-ID** CLI via:
+Install the **tru.ID** CLI via:
 
 ```bash
 npm i -g @tru_id/cli
 
 ```
 
-Input your **tru-ID** credentials which can be found within the **tru-ID** [console](https://developer.tru.id/console)
+Input your **tru.ID** credentials which can be found within the **tru.ID** [console](https://developer.tru.id/console)
 
-Create a new **tru-ID** project via:
+Create a new **tru.ID** project via:
 
 ```
 tru projects:create sms-2fa
@@ -72,8 +66,8 @@ tru projects:create sms-2fa
 
 configure the following values in your `.env`:
 
-- `TRU_ID_CLIENT`: The client ID found in the `tru.json` file in the newly created **tru-ID** project.
-- `TRU_ID_SECRET`: The client secret found in the `tru.json` file in the newly created **tru-ID** project.
+- `TRU_ID_CLIENT`: The client ID found in the `tru.json` file in the newly created **tru.ID** project.
+- `TRU_ID_SECRET`: The client secret found in the `tru.json` file in the newly created **tru.ID** project.
 
 ## Starting the project
 
@@ -87,20 +81,10 @@ npm install
 
 This will also run Database migrations creating the `users` table.
 
-If you would like to seed the project with a user:
-
-Navigate to `seeders/createUser.js` and replace the `phoneNumber` value with your own `phoneNumber`
-
-Next seed the database by running:
-
-```
-npm run seed
-```
-
 Finally, to start the project run:
 
 ```bash
-npm run linuxstart #for running on Linux machines e.g. Mac
+npm run nixstart #for running on Linux machines e.g. Mac
 # or
 npm run winstart #for running on Windows machines
 ```
@@ -108,6 +92,10 @@ npm run winstart #for running on Windows machines
 The project should look like this on startup:
 
 ![alt text](./images/startup.PNG "Starter App")
+
+The register page should look like this:
+
+![alt text](./images/register.PNG "Register Screen")
 
 ## Existing App Workflow
 
@@ -134,7 +122,7 @@ The workflow now looks like this:
 
 In order to perform the SIMCheck we need to do two things:
 
-- Create a **tru-ID** access token.
+- Create a **tru.ID** access token.
 - Create a SIMCheck using the newly generated access token.
 
 In order to do any of the two listed above we need to bring in a few packages. Open a new terminal and run:
@@ -145,7 +133,7 @@ npm install --save btoa node-fetch
 
 `btoa` transforms data to base-64 encoded format and `node-fetch` allows us make HTTP network requests in our Node applications.
 
-## Creating the Access Token
+### Creating the Access Token
 
 In order to create the access token create a new folder called `helpers` , create a file named `createAccessToken.js` and paste in the following code:
 
@@ -182,7 +170,7 @@ Lastly in the body we set `grant_type` to `client_credentials` and `scope` to `s
 
 The `scope` instructs the tru.ID OAuth provider that the created Access Token should have permissions to use SIMCheck resources as indicated by `sim_check`.
 
-## Creating the SIMCheck
+### Creating the SIMCheck
 
 In the `helpers` folder create a file named `performSimCheck.js` and paste the following code:
 
@@ -208,33 +196,36 @@ Here we make accept a phone number in E.164 format, the access token from the pr
 
 A sample successful response is:
 
-![alt text](./images/sim-success.PNG "Successful SIMCheck")
+```
+{
+  _links: {
+    self: {
+      href: 'https://eu.api.tru.id/sim_check/v0.1/c6-bbae-50358ae3bb08'
+    }
+  },
+  check_id: '2563f2a6-0b9e-49c6-bbae-50358ae3bb08',
+  status: 'COMPLETED',
+  no_sim_change: true,
+  charge_amount: 1,
+  charge_currency: 'API',
+  created_at: '2021-03-17T14:49:29+0000',
+  snapshot_balance: 13
+}
+```
 
 A sample failure response is:
 
-![alt text](./images/sim-failed.PNG "Unsuccessful SIMCheck")
-
-## Creating the SIMCheck UI
-
-Next, we need to create the UI we'll show if the SIMCheck failed or the SIM changed. Ideally, if any of those two conditions were met you'd be better off sending an email to the user to confirm their identity but for simplicity sake we'll render a UI.
-
-Head over to `views` and create a file named `sim-changed.pug` and paste the following code:
-
 ```
-extends layout
-
-block content
-  h1 #{error}
-
+{
+type: 'https://tru.id/docs/api-errors#mno_not_supported',
+  title: 'Bad Request',
+  status: 400,
+  detail: '400 Bad Request Mobile Network Operator
+Not Supported'
+}
 ```
 
-`#{error}` is dynamic meaning we pass it in when we render this view.
-
-The UI looks like this:
-
-![alt text](./images/sim-changed.PNG "SIMCheck error view")
-
-## Integrating our changes
+## Integrating our helper functions
 
 Finally, we need to integrate our changes to augment the workflow. Head over to `routes/verify.js` and in the `try` of `router.get('/', ensureLoggedIn(),async (req,res)=> {})` paste the following code:
 
@@ -254,7 +245,7 @@ router.get("/", ensureLoggedIn(), async (req, res) => {
       console.log(no_sim_change);
       // If the SIM has changed we inform the client
       if (!no_sim_change) {
-        return res.render("sim-changed", { error: "SIMCheck failed. SIM changed too recently." });
+
       }
       verificationRequest = await twilio.verify
         .services(VERIFICATION_SID)
@@ -287,7 +278,6 @@ router.get("/", ensureLoggedIn(), async (req, res) => {
       console.log(no_sim_change);
       // If the SIM has changed we inform the client
       if (!no_sim_change) {
-        return res.render("sim-changed", { error: "SIMCheck failed. SIM changed too recently." });
       }
       verificationRequest = await twilio.verify
         .services(VERIFICATION_SID)
@@ -306,15 +296,77 @@ router.get("/", ensureLoggedIn(), async (req, res) => {
 });
 ```
 
-Right before we generate the OTP we create the access token and perform the SIMCheck and if the SIM has changed or the request errors out we render the `sim-changed` view passing in our custom `error` message.
+Right before we generate the OTP we create the access token and perform the SIMCheck and if the SIM has changed or the request errors out we handle it within the `if(!no_sim_change)` block.
+
+## Handling SIMCheck Response
+
+Next, we need to create the UI we'll show if the SIMCheck can't be performed because we don't support the mobile carrier or if the SIMCheck response informs us that the SIM changed. Ideally, if any of those two conditions were met you'd be better off sending an email to the user to confirm their identity but for simplicity sake we'll render a UI.
+
+Head over to `views` and create a file named `sim-changed.pug` and paste the following code:
+
+```
+extends layout
+
+block content
+  .text-center
+  h1 #{error}
+
+
+```
+
+`#{error}` is dynamic meaning we pass it in when we render this view.
+
+The UI looks like this:
+
+![alt text](./images/sim-changed.PNG "SIMCheck error view")
+
+We then render it to the screen inside the `if` block:
+
+```javascript
+const { createAccessToken } = require("../helpers/createAccessToken");
+const { performSimCheck } = require("../helpers/performSimCheck");
+router.get("/", ensureLoggedIn(), async (req, res) => {
+  if (req.user.role !== "access secret content") {
+  ...
+
+    try {
+      //create tru.ID access token
+      ...
+
+      // perform SIMCheck
+  ...
+      // If the SIM has changed we inform the client
+      if (!no_sim_change) {
+        return res.render("sim-changed", { error: "Cannot proceed. SIM changed too recently ❌" });
+      }
+      verificationRequest = await twilio.verify
+        .services(VERIFICATION_SID)
+        .verifications.create({ to: req.user.phoneNumber, channel });
+    }
+    ...
+  }
+
+ ...
+});
+```
 
 ## Wrapping up
 
-That's it! That's how simple it is to add SIM Swap detection to your existing 2FA application with **tru-ID's** SIMCheck API.
+That's it! That's how simple it is to add SIM Swap detection to your existing 2FA application with **tru.ID's** SIMCheck API.
+
+If you would like to seed the project with a user instead of having to register:
+
+Navigate to `seeders/createUser.js` and replace the `phoneNumber` value with your own `phoneNumber`
+
+Next seed the database by running:
+
+```
+npm run seed
+```
 
 You can view the diff between the base repo (Twilio's) and the finished app [here](https://github.com/TwilioDevEd/verify-v2-quickstart-node/compare/next...tru-ID:main)
 
 ## Resources
 
-- [tru-ID SIMCheck Integration guide](https://developer.tru.id/docs/sim-check/guide)
+- [tru.ID SIMCheck Integration guide](https://developer.tru.id/docs/sim-check/guide)
 - [Twilio's verify-v2-quick-start-node](https://github.com/TwilioDevEd/verify-v2-quickstart-node)
