@@ -113,7 +113,7 @@ The project should look like this on startup:
 
 The existing app workflow is as follows:
 
-1. Navigate to `/` , redirect to `/login` if logged in.
+1. Navigate to `/` , redirect to `/login` if not logged in.
 2. Login an existing user or register a new user.
 3. On successful registration or login, redirect to `/verify` for SMS OTP verification with Twilio's Verify API to take place.
 4. If OTP could not be sent or OTP does not match render error to user. If OTP matches, assign a role to the user so as to access guarded `/` route and redirect to `/`.
