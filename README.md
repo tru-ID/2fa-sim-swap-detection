@@ -71,7 +71,7 @@ In order to restore dependencies run:
 npm install
 ```
 
-This comes will also run Database migrations creating the `users` table.
+This will also run Database migrations creating the `users` table.
 
 If you would like to seed the project with a user:
 
