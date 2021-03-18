@@ -124,7 +124,7 @@ We're going to introduce SIM Swap detection to the existing workflow by doing a 
 
 The workflow now looks like this:
 
-1. Navigate to `/` , redirect to `/login` if logged in.
+1. Navigate to `/` , redirect to `/login` if not logged in.
 2. Login an existing user or register a new user.
 3. On successful registration or login, redirect to `/verify` for SMS OTP verification with Twilio's Verify API to take place.
 4. Perform SIMCheck before OTP generation. Truncate login process if SIMCheck fails else continue with OTP generation.
