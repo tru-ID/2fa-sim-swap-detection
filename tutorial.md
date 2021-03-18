@@ -317,3 +317,4 @@ You can view the diff between the base repo (Twilio's) and the finished app [her
 ## Resources
 
 - [tru-ID SIMCheck Integration guide](https://developer.tru.id/docs/sim-check/guide)
+- [Twilio's verify-v2-quick-start-node](https://github.com/TwilioDevEd/verify-v2-quickstart-node)
