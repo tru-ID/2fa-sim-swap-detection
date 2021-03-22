@@ -46,6 +46,7 @@ router.post('/', async (req, res) => {
         password: hashed_password,
         phoneNumber,
         verificationMethod,
+        role: 'new user',
       });
     } catch (e) {
       res.status(500).send(e.toString());
