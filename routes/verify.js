@@ -16,12 +16,14 @@ router.get("/", ensureLoggedIn(), async (req, res) => {
     try {
       //create tru.ID access token
       const accessToken = await createAccessToken();
-      console.log(accessToken);
+      logger.debug.log("accessToken", accessToken);
+
       // perform SIMCheck
       const no_sim_change = await performSimCheck(req.user.phoneNumber.split("+")[1], accessToken);
-      console.log(no_sim_change);
-      // If the SIM has changed we inform the client
-      if (!no_sim_change) {
+      logger.debug("no_sim_change", no_sim_change);
+
+      // If the SIM has changed we inform the client unless the user is new
+      if (no_sim_change === false && req.user.role !== "new user") {
         return res.render("sim-changed", { error: "Cannot proceed. SIM changed too recently ❌" });
       }
       verificationRequest = await twilio.verify
