@@ -41,6 +41,11 @@ router.post("/", async (req, res) => {
         phoneNumber,
         verificationMethod,
         fullyVerified: null,
+        timeDifference: new Date(
+          new Date().getFullYear(),
+          new Date().getMonth() + 1,
+          new Date().getDay() + 7
+        ).getTime(),
       });
     } catch (e) {
       res.status(500).send(e.toString());

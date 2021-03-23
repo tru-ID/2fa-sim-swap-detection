@@ -1,7 +1,6 @@
 const bcrypt = require("bcrypt");
 
 module.exports = (sequelize, DataTypes) => {
-  
   const User = sequelize.define("User", {
     username: {
       type: DataTypes.STRING,
@@ -26,6 +25,10 @@ module.exports = (sequelize, DataTypes) => {
     fullyVerified: {
       type: DataTypes.BOOLEAN,
       allowNull: true,
+    },
+    timeDifference: {
+      type: DataTypes.INTEGER,
+      allowNull: false,
     },
   });
 
