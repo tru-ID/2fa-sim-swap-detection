@@ -1,12 +1,12 @@
-const express = require('express');
-const passport = require('passport');
-const db = require('../models');
+const express = require("express");
+const passport = require("passport");
+const db = require("../models");
 
 const router = express.Router();
 const loginRouter = express.Router();
 
-loginRouter.get('/', (req, res) => {
-  res.render('login', { title: 'Login', errors: {} });
+loginRouter.get("/", (req, res) => {
+  res.render("login", { title: "Login", errors: {} });
 });
 
 async function login(req, user) {
@@ -21,14 +21,14 @@ async function login(req, user) {
   });
 }
 
-loginRouter.post('/', (req, res, next) => {
-  passport.authenticate('local', async (err, user) => {
+loginRouter.post("/", (req, res, next) => {
+  passport.authenticate("local", async (err, user) => {
     if (err) {
       return next(err);
     }
     if (user !== false) {
       await login(req, user);
-      return res.redirect('/');
+      return res.redirect("/");
     }
     const errors = { wasValidated: true };
     const { username, password } = req.body;
@@ -37,20 +37,22 @@ loginRouter.post('/', (req, res, next) => {
     user = await db.User.findOne({ where: { username } });
 
     if (user === null) {
-      errors.username = 'Username does not exist.';
+      errors.username = "Username does not exist.";
     } else if (!user.isValidPassword(password)) {
-      errors.password = 'Incorrect password';
+      errors.password = "Incorrect password";
     }
 
-    return res.render('login', { errors });
+    return res.render("login", { errors });
   })(req, res, next);
 });
 
-router.use('/login', loginRouter);
+router.use("/login", loginRouter);
 
-router.get('/logout', (req, res) => {
+router.get("/logout", async (req, res) => {
+  req.user.role = "";
+  await req.user.save();
   req.logout();
-  res.redirect('/');
+  res.redirect("/");
 });
 
 module.exports = router;

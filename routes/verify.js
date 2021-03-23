@@ -20,10 +20,22 @@ router.get("/", ensureLoggedIn(), async (req, res) => {
       // perform SIMCheck
       const no_sim_change = await performSimCheck(req.user.phoneNumber.split("+")[1], accessToken);
       console.log(no_sim_change);
-      // If the SIM has changed we inform the client
-      if (!no_sim_change) {
+      console.log("the date as we know it is", req.user.createdAt.split("T")[0]);
+      // If the SIM has changed within 7 days, the user has not successfully performed a SIMCheck before and the user is older than 7 days we render our `sim-changed` view
+      if (
+        !no_sim_change &&
+        !req.user.fullyVerified &&
+        new Date(req.user.createdAt.split("T")[0]).getTime() >
+          new Date(new Date().getFullYear(), new Date().getMonth(), new Date().getDay() + 7).getTime()
+      ) {
         return res.render("sim-changed", { error: "Cannot proceed. SIM changed too recently ❌" });
+        // `no_sim_change` was successful we update the `fullyVerified` field
+      } else if (no_sim_change) {
+        // ideally should get here
+        req.user.fullyVerified = true;
+        await req.user.save();
       }
+      // every other scenario i.e. sim changed but the user isn't up to 7 days or
       verificationRequest = await twilio.verify
         .services(VERIFICATION_SID)
         .verifications.create({ to: req.user.phoneNumber, channel });
