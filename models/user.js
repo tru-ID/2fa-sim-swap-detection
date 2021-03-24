@@ -26,10 +26,6 @@ module.exports = (sequelize, DataTypes) => {
       type: DataTypes.BOOLEAN,
       allowNull: true,
     },
-    timeDifference: {
-      type: DataTypes.INTEGER,
-      allowNull: false,
-    },
   });
 
   User.generateHash = (password) => bcrypt.hashSync(password, bcrypt.genSaltSync(8), null);

@@ -35,14 +35,6 @@ module.exports = {
         allowNull: false,
         type: Sequelize.DATE,
       },
-      fullyVerified: {
-        allowNull: true,
-        type: Sequelize.BOOLEAN,
-      },
-      timeDifference: {
-        allowNull: false,
-        type: Sequelize.INTEGER,
-      },
     }),
   down: (queryInterface) => queryInterface.dropTable("Users"),
 };

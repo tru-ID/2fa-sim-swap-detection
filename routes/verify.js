@@ -6,6 +6,15 @@ const logger = require("../logger")();
 const { createAccessToken } = require("../helpers/createAccessToken");
 const { performSimCheck } = require("../helpers/performSimCheck");
 const router = express.Router();
+// function for handling if the SIMCheck was successful , if the user has successfully performed the SIMCheck before and if the user is older than 7 days
+const passSIMCheck = function (user, no_sim_change) {
+  const sevenDaysMilliseconds = 7 * 24 * 60 * 60 * 1000;
+
+  if (no_sim_change) return true;
+  if (user.fullyVerified) return false;
+  if (Date.now() - user.createdAt > sevenDaysMilliseconds) return false;
+  return true;
+};
 
 router.get("/", ensureLoggedIn(), async (req, res) => {
   if (req.user.role !== "access secret content") {
@@ -17,29 +26,19 @@ router.get("/", ensureLoggedIn(), async (req, res) => {
       //create tru.ID access token
       const accessToken = await createAccessToken();
       console.log(accessToken);
+
       // perform SIMCheck
       const no_sim_change = await performSimCheck(req.user.phoneNumber.split("+")[1], accessToken);
       console.log(no_sim_change);
-      // log the time difference for the next seven days
-      console.log(req.user.timeDifference);
+
       // If the SIM has changed within 7 days, the user has not successfully performed a SIMCheck before and the user is older than 7 days we render our `sim-changed` view
-      if (!no_sim_change && !req.user.fullyVerified && new Date().getTime() > req.user.timeDifference) {
+      if (passSIMCheck(req.user, no_sim_change) === false) {
         return res.render("sim-changed", { error: "Cannot proceed. SIM changed too recently ❌" });
-      }
-      // `no_sim_change` is true i.e. user hasn't updated we update the `fullyVerified` field
-      if (no_sim_change) {
+      } else if (!req.user.fullyVerified) {
         req.user.fullyVerified = true;
         await req.user.save();
       }
-      // if today is older than 7 days ago when the user made an account update the timeDifference for the next 7 days
-      if (new Date().getTime() > req.user.timeDifference) {
-        req.user.timeDifference = new Date(
-          new Date().getFullYear(),
-          new Date().getMonth() + 1,
-          new Date().getDay() + 7
-        ).getTime();
-        await req.user.save();
-      }
+
       // every other scenario i.e. sim changed but the user isn't up to 7 days or
       verificationRequest = await twilio.verify
         .services(VERIFICATION_SID)
