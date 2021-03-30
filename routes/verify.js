@@ -6,6 +6,18 @@ const logger = require('../logger')();
 
 const router = express.Router();
 
+const { createAccessToken } = require('../helpers/createAccessToken');
+const { performSimCheck } = require('../helpers/performSimCheck');
+
+const passSIMCheck = function (user, noSimChange) {
+  const sevenDaysMilliseconds = 7 * 24 * 60 * 60 * 1000;
+
+  if (noSimChange) return true;
+  if (user.fullyVerified) return false;
+  if (Date.now() - user.createdAt > sevenDaysMilliseconds) return false;
+  return true;
+};
+
 router.get('/', ensureLoggedIn(), async (req, res) => {
   if (req.user.role !== 'access secret content') {
     const errors = { wasValidated: false };
@@ -13,9 +25,34 @@ router.get('/', ensureLoggedIn(), async (req, res) => {
     let verificationRequest;
 
     try {
-      verificationRequest = await twilio.verify.services(VERIFICATION_SID)
-        .verifications
-        .create({ to: req.user.phoneNumber, channel });
+      //create tru.ID access token
+      const accessToken = await createAccessToken();
+      console.log(accessToken);
+
+      // perform SIMCheck
+      const noSimChange = await performSimCheck(
+        req.user.phoneNumber.replace(/\s+/g, ''),
+        accessToken,
+      );
+      console.log(noSimChange);
+
+      // If the SIM has changed within 7 days, the user has not successfully performed a SIMCheck before
+      // and the user is older than 7 days we render our `sim-changed` view
+      if (passSIMCheck(req.user, noSimChange) === false) {
+        return res.render('sim-changed', {
+          error: 'Cannot proceed. SIM changed too recently ❌',
+        });
+      }
+      
+      if (!req.user.fullyVerified) {
+        req.user.fullyVerified = true;
+        await req.user.save();
+      }
+
+      // every other scenario i.e. sim changed but the user isn't up to 7 days or
+      verificationRequest = await twilio.verify
+        .services(VERIFICATION_SID)
+        .verifications.create({ to: req.user.phoneNumber, channel });
     } catch (e) {
       logger.error(e);
       return res.status(500).send(e);
@@ -27,7 +64,7 @@ router.get('/', ensureLoggedIn(), async (req, res) => {
   }
 
   throw new Error('User already has `access secret content` role.');
-});
+})
 
 router.post('/', ensureLoggedIn(), async (req, res) => {
   const { verificationCode: code } = req.body;

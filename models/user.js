@@ -22,6 +22,10 @@ module.exports = (sequelize, DataTypes) => {
       type: DataTypes.STRING,
       allowNull: false,
     },
+    fullyVerified: {
+      type: DataTypes.BOOLEAN,
+      allowNull: true,
+    },
   });
 
   User.generateHash = password => bcrypt.hashSync(password, bcrypt.genSaltSync(8), null);
