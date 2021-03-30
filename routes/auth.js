@@ -48,9 +48,12 @@ loginRouter.post("/", (req, res, next) => {
 
 router.use("/login", loginRouter);
 
-router.get("/logout", async (req, res) => {
-  req.user.role = "";
+
+router.get('/logout', async (req, res) => {
+  req.user.role = '';
   await req.user.save();
+
+
   req.logout();
   res.redirect("/");
 });
