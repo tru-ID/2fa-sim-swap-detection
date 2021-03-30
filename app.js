@@ -38,34 +38,31 @@ passport.serializeUser((user, cb) => {
   cb(null, user.id);
 });
 passport.deserializeUser((id, done) => {
-  db.User.findByPk(id).then((user) => {
-    done(null, user);
-  });
+  db.User.findByPk(id).then((user) => { done(null, user); });
 });
-passport.use(
-  new Strategy((username, password, done) => {
+passport.use(new Strategy(
+  ((username, password, done) => {
     // log.debug({ username, password });
     // log.debug(process.env.NODE_ENV);
     db.User.findOne({
       where: { username },
-    }).then((user) => {
-      // log.debug(user);
-      if (user !== null) {
-        if (user.isValidPassword(password)) {
-          return done(null, user);
+    })
+      .then((user) => {
+        // log.debug(user);
+        if (user !== null) {
+          if (user.isValidPassword(password)) {
+            return done(null, user);
+          }
         }
-      }
 
-      return done(null, false);
-    });
-  })
-);
+        return done(null, false);
+      });
+  }),
+));
 
-app.use(
-  cookieSession({
-    secret: 'replace me in production',
-  })
-);
+app.use(cookieSession({
+  secret: 'replace me in production',
+}));
 
 app.use(passport.initialize());
 app.use(passport.session());
