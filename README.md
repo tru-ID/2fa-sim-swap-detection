@@ -88,7 +88,9 @@ npm run seed
 In order to start the project run:
 
 ```bash
+
 npm run linuxstart #for running on Linux machines e.g. Mac
+
 # or
 npm run winstart #for running on Windows machines
 ```

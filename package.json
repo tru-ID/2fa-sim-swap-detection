@@ -11,6 +11,7 @@
     "test": "./node_modules/.bin/mocha './{,!(node_modules)/**}/*.spec.js'",
     "test_watch": "./node_modules/.bin/mocha -w './{,!(node_modules)/**}/*.spec.js'",
     "postinstall": "npm run build && sequelize db:migrate",
+    "migrate": "sequelize db:migrate",
     "build": "webpack --mode=development",
     "seed": "npm run sequelize db:seed:undo:all && npm run sequelize db:seed:all"
   },

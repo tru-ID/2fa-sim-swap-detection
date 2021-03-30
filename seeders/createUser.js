@@ -9,6 +9,7 @@ module.exports = {
           password: db.User.generateHash("password"),
           verificationMethod: "sms",
           phoneNumber: "+447743868561",
+          fullyVerified: null,
           createdAt: new Date(),
           updatedAt: new Date(),
         },

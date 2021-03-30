@@ -1,7 +1,7 @@
-const bcrypt = require('bcrypt');
+const bcrypt = require("bcrypt");
 
 module.exports = (sequelize, DataTypes) => {
-  const User = sequelize.define('User', {
+  const User = sequelize.define("User", {
     username: {
       type: DataTypes.STRING,
       unique: true,
@@ -28,7 +28,7 @@ module.exports = (sequelize, DataTypes) => {
     },
   });
 
-  User.generateHash = password => bcrypt.hashSync(password, bcrypt.genSaltSync(8), null);
+  User.generateHash = (password) => bcrypt.hashSync(password, bcrypt.genSaltSync(8), null);
 
   // eslint-disable-next-line func-names
   User.prototype.isValidPassword = function (password) {
